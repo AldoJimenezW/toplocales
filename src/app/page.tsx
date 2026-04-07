@@ -1,4 +1,7 @@
-import { getStreamersData } from '@/lib/kick-api';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Streamer } from '@/lib/types';
 import { StreamerCard } from '@/components/StreamerCard';
 
 const STREAMER_USERNAMES = [
@@ -10,11 +13,88 @@ const STREAMER_USERNAMES = [
   'role7',
 ];
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 30;
+interface KickChannel {
+  id: number;
+  slug: string;
+  user: {
+    id: number;
+    username: string;
+    profile_pic: string;
+  };
+  livestream: {
+    id: number;
+    slug: string;
+    session_title: string;
+    is_live: boolean;
+    viewer_count: number;
+    thumbnail: {
+      url: string;
+    };
+    categories: Array<{
+      name: string;
+    }>;
+  } | null;
+}
 
-export default async function Home() {
-  const streamers = await getStreamersData(STREAMER_USERNAMES);
+async function getKickChannel(username: string): Promise<Streamer> {
+  try {
+    const response = await fetch(`https://kick.com/api/v2/channels/${username}`, {
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Referer': 'https://kick.com',
+        'Origin': 'https://kick.com'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch channel: ${username}`);
+    }
+
+    const data: KickChannel = await response.json();
+
+    return {
+      username: data.slug,
+      displayName: data.user.username,
+      profilePic: data.user.profile_pic || '',
+      isLive: data.livestream?.is_live || false,
+      streamTitle: data.livestream?.session_title || '',
+      streamCategory: data.livestream?.categories?.[0]?.name || '',
+      viewers: data.livestream?.viewer_count || 0,
+      thumbnail: data.livestream?.thumbnail?.url || ''
+    };
+  } catch (error) {
+    console.error(`Error fetching channel ${username}:`, error);
+    return {
+      username,
+      displayName: username,
+      profilePic: '',
+      isLive: false,
+      streamTitle: '',
+      streamCategory: '',
+      viewers: 0,
+      thumbnail: ''
+    };
+  }
+}
+
+export default function Home() {
+  const [streamers, setStreamers] = useState<Streamer[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      const data = await Promise.all(
+        STREAMER_USERNAMES.map(username => getKickChannel(username))
+      );
+      setStreamers(data);
+      setLoading(false);
+    }
+    fetchData();
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   const liveStreamers = streamers.filter(s => s.isLive);
   const offlineStreamers = streamers.filter(s => !s.isLive);
   const sortedStreamers = [...liveStreamers, ...offlineStreamers];
@@ -52,7 +132,12 @@ export default async function Home() {
               <div className="flex items-center gap-3">
                 <div className="relative px-4 py-2 rounded-full bg-black/60 border border-green-500/20">
                   <div className="flex items-center gap-3">
-                    {liveStreamers.length > 0 ? (
+                    {loading ? (
+                      <>
+                        <span className="h-2.5 w-2.5 rounded-full bg-neutral-600 animate-pulse" />
+                        <span className="text-sm text-neutral-400">Cargando...</span>
+                      </>
+                    ) : liveStreamers.length > 0 ? (
                       <>
                         <span className="relative flex h-2.5 w-2.5">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -82,7 +167,7 @@ export default async function Home() {
             ))}
           </div>
 
-          {streamers.length === 0 && (
+          {loading && (
             <div className="flex flex-col items-center justify-center py-32">
               <div className="w-16 h-16 border-4 border-green-500/30 border-t-green-500 rounded-full animate-spin" />
               <p className="mt-6 text-neutral-400 text-lg font-medium">Cargando streamers...</p>
