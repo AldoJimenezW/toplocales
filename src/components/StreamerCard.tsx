@@ -14,7 +14,10 @@ const formatViewers = (num: number): string => {
 export function StreamerCard({ streamer }: StreamerCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [imgError, setImgError] = useState(false);
-  const [thumbError, setThumbError] = useState(false);
+
+  const goToKick = () => {
+    window.open(`https://kick.com/${streamer.username}`, '_blank');
+  };
 
   return (
     <div
@@ -24,8 +27,8 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
     >
       <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       
-      <div className="relative p-5 flex flex-col items-center cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
-        <div className="relative">
+      <div className="relative p-5 flex flex-col items-center">
+        <div className="relative cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
           <div className={`relative w-20 h-20 rounded-full overflow-hidden ring-2 transition-all duration-300 ${
             streamer.isLive ? 'ring-red-500 shadow-lg shadow-red-500/30' : 'ring-neutral-700'
           }`}>
@@ -55,7 +58,10 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
           )}
         </div>
 
-        <h3 className="mt-3 text-base font-bold text-white group-hover:text-green-400 transition-colors">
+        <h3 
+          className="mt-3 text-base font-bold text-white group-hover:text-green-400 transition-colors cursor-pointer"
+          onClick={goToKick}
+        >
           {streamer.displayName}
         </h3>
 
@@ -79,7 +85,10 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
           </div>
         )}
 
-        <div className="mt-3 flex items-center gap-1 text-green-500/60 group-hover:text-green-400 transition-colors">
+        <div 
+          className="mt-3 flex items-center gap-1 text-green-500/60 group-hover:text-green-400 transition-colors cursor-pointer"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
           <span className="text-xs font-medium">{isExpanded ? 'Ver menos' : 'Ver más'}</span>
           <svg 
             className={`w-3 h-3 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} 
@@ -93,10 +102,9 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
       </div>
 
       <div
-        className={`transition-all duration-300 ease-out ${
+        className={`transition-all duration-300 ease-out overflow-hidden ${
           isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
         }`}
-        style={{ display: isExpanded ? 'block' : 'none' }}
       >
         <div className="px-4 pb-4">
           <div className="border-t border-neutral-800/50 pt-4">
@@ -116,15 +124,20 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
                   {streamer.streamTitle || 'En vivo ahora'}
                 </h4>
 
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(`https://kick.com/${streamer.username}`, '_blank');
-                  }}
-                  className="mt-4 w-full text-center bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black font-bold py-2.5 px-4 rounded-xl transition-all duration-300 shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transform hover:scale-[1.02]"
-                >
-                  Ver Stream en Kick
-                </button>
+                <div className="mt-4 flex flex-col gap-2">
+                  <button
+                    onClick={goToKick}
+                    className="w-full text-center bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black font-bold py-2.5 px-4 rounded-xl transition-all duration-300 shadow-lg shadow-green-500/25"
+                  >
+                    Ver Stream en Kick
+                  </button>
+                  <button
+                    onClick={goToKick}
+                    className="w-full text-center bg-neutral-800 hover:bg-neutral-700 text-white font-medium py-2 px-4 rounded-xl transition-colors"
+                  >
+                    Ver Canal
+                  </button>
+                </div>
               </>
             ) : (
               <div className="text-center py-6">
@@ -135,10 +148,7 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
                 </div>
                 <p className="text-sm text-neutral-400 mb-3">Actualmente offline</p>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(`https://kick.com/${streamer.username}`, '_blank');
-                  }}
+                  onClick={goToKick}
                   className="inline-flex items-center gap-2 text-sm text-green-400 hover:text-green-300 font-medium transition-colors"
                 >
                   Visitar canal
