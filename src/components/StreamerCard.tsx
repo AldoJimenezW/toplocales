@@ -16,7 +16,7 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
   const [imgError, setImgError] = useState(false);
 
   const openKick = () => {
-    window.location.href = `https://kick.com/${streamer.username}`;
+    window.open(`https://kick.com/${streamer.username}`, '_blank');
   };
 
   return (
@@ -28,10 +28,7 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
       <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       
       <div className="relative p-5 flex flex-col items-center">
-        <div 
-          className="relative cursor-pointer" 
-          onClick={() => setIsExpanded(!isExpanded)}
-        >
+        <div className="relative">
           <div className={`relative w-20 h-20 rounded-full overflow-hidden ring-2 transition-all duration-300 ${
             streamer.isLive ? 'ring-red-500 shadow-lg shadow-red-500/30' : 'ring-neutral-700'
           }`}>
@@ -61,10 +58,7 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
           )}
         </div>
 
-        <h3 
-          className="mt-3 text-base font-bold text-white group-hover:text-green-400 transition-colors cursor-pointer"
-          onClick={openKick}
-        >
+        <h3 className="mt-3 text-base font-bold text-white group-hover:text-green-400 transition-colors">
           {streamer.displayName}
         </h3>
 
@@ -89,10 +83,10 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
         )}
 
         <div 
-          className="mt-3 flex items-center gap-1 text-green-500/60 group-hover:text-green-400 transition-colors cursor-pointer"
+          className="mt-3 flex items-center gap-1 text-green-500/60 group-hover:text-green-400 transition-colors"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          <span className="text-xs font-medium">{isExpanded ? 'Ver menos' : 'Ver más'}</span>
+          <span className="text-xs font-medium cursor-pointer">{isExpanded ? 'Ver menos' : 'Ver más'}</span>
           <svg 
             className={`w-3 h-3 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} 
             fill="none" 
@@ -113,7 +107,10 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
           <div className="border-t border-neutral-800/50 pt-4">
             {streamer.isLive ? (
               <>
-                <div className="relative aspect-video rounded-xl overflow-hidden bg-neutral-900 mb-3">
+                <div 
+                  onClick={openKick}
+                  className="relative aspect-video rounded-xl overflow-hidden bg-neutral-900 mb-3 cursor-pointer group/thumb"
+                >
                   <iframe
                     src={`https://player.kick.com/${streamer.username}?autoplay=true&muted=true`}
                     className="w-full h-full"
@@ -121,18 +118,20 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
                     style={{ border: 'none' }}
                     allow="autoplay; fullscreen"
                   />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/thumb:opacity-100 transition-opacity bg-black/30">
+                    <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-black ml-1" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
 
                 <h4 className="font-medium text-sm text-white line-clamp-2 leading-relaxed">
                   {streamer.streamTitle || 'En vivo ahora'}
                 </h4>
 
-                <div
-                  onClick={openKick}
-                  className="mt-4 w-full text-center bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black font-bold py-2.5 px-4 rounded-xl transition-all duration-300 shadow-lg shadow-green-500/25 cursor-pointer"
-                >
-                  Ver Stream en Kick
-                </div>
+                <p className="mt-2 text-xs text-neutral-500">Click en el video para ver en Kick</p>
               </>
             ) : (
               <div className="text-center py-6">
@@ -141,16 +140,7 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <p className="text-sm text-neutral-400 mb-3">Actualmente offline</p>
-                <div
-                  onClick={openKick}
-                  className="inline-flex items-center gap-2 text-sm text-green-400 hover:text-green-300 font-medium transition-colors cursor-pointer"
-                >
-                  Visitar canal
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </div>
+                <p className="text-sm text-neutral-400">Actualmente offline</p>
               </div>
             )}
           </div>
