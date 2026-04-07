@@ -8,7 +8,8 @@ export interface KickChannel {
   };
   livestream: {
     id: number;
-    title: string;
+    slug: string;
+    session_title: string;
     is_live: boolean;
     viewer_count: number;
     thumbnail: {

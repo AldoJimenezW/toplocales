@@ -2,9 +2,14 @@ import { KickChannel, Streamer } from './types';
 
 export async function getKickChannel(username: string): Promise<Streamer> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/channel?username=${username}`, {
-      cache: 'no-store'
+    const response = await fetch(`https://kick.com/api/v2/channels/${username}`, {
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Referer': 'https://kick.com',
+        'Origin': 'https://kick.com'
+      },
+      next: { revalidate: 30 }
     });
 
     if (!response.ok) {
@@ -18,7 +23,7 @@ export async function getKickChannel(username: string): Promise<Streamer> {
       displayName: data.user.username,
       profilePic: data.user.profile_pic || '',
       isLive: data.livestream?.is_live || false,
-      streamTitle: data.livestream?.title || '',
+      streamTitle: data.livestream?.session_title || '',
       streamCategory: data.livestream?.categories?.[0]?.name || '',
       viewers: data.livestream?.viewer_count || 0,
       thumbnail: data.livestream?.thumbnail?.url || ''
