@@ -116,15 +116,15 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
                   {streamer.streamTitle || 'En vivo ahora'}
                 </h4>
 
-                <a
-                  href={`https://kick.com/${streamer.username}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 block w-full text-center bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black font-bold py-2.5 px-4 rounded-xl transition-all duration-300 shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transform hover:scale-[1.02]"
-                  onClick={(e) => e.stopPropagation()}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(`https://kick.com/${streamer.username}`, '_blank');
+                  }}
+                  className="mt-4 w-full text-center bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black font-bold py-2.5 px-4 rounded-xl transition-all duration-300 shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transform hover:scale-[1.02]"
                 >
                   Ver Stream en Kick
-                </a>
+                </button>
               </>
             ) : (
               <div className="text-center py-6">
@@ -134,18 +134,18 @@ export function StreamerCard({ streamer }: StreamerCardProps) {
                   </svg>
                 </div>
                 <p className="text-sm text-neutral-400 mb-3">Actualmente offline</p>
-                <a
-                  href={`https://kick.com/${streamer.username}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(`https://kick.com/${streamer.username}`, '_blank');
+                  }}
                   className="inline-flex items-center gap-2 text-sm text-green-400 hover:text-green-300 font-medium transition-colors"
-                  onClick={(e) => e.stopPropagation()}
                 >
                   Visitar canal
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
-                </a>
+                </button>
               </div>
             )}
           </div>
